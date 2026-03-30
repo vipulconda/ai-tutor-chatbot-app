@@ -6,17 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:mobile": "cd mobile && npx expo start"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.53",
+    "@ai-sdk/openai": "^3.0.48",
+    "@auth/prisma-adapter": "^2.11.1",
+    "@libsql/client": "^0.17.2",
+    "@prisma/adapter-libsql": "^7.6.0",
+    "@prisma/client": "^7.6.0",
+    "ai": "^6.0.141",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
     "next": "16.2.1",
+    "next-auth": "^5.0.0-beta.30",
+    "prisma": "^7.6.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "typescript": "^5"
