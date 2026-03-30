@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 🧠 EduBot — AI Tutor for Indian Students
 
@@ -223,8 +223,8 @@ erDiagram
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-username/ai_tutor_chatbot_app.git
-cd ai_tutor_chatbot_app
+git clone https://github.com/vipulconda/ai-tutor-chatbot-app.git
+cd ai-tutor-chatbot-app
 npm install
 ```
 
@@ -320,6 +320,7 @@ ollama pull qwen2.5:7b-instruct
 Primary AI tutoring endpoint with multi-model routing and streaming support.
 
 **Request body:**
+
 ```json
 {
   "message": "What is photosynthesis?",
@@ -332,7 +333,8 @@ Primary AI tutoring endpoint with multi-model routing and streaming support.
 ```
 
 **Response variants:**
-```json
+
+```jsonc
 // Standard response
 { "assistantResponse": "Photosynthesis is..." }
 
@@ -442,4 +444,3 @@ This project is private and not currently licensed for public distribution.
 🧠 EduBot — Making quality education accessible through AI
 
 </div>
-]]>
