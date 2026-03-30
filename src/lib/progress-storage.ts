@@ -10,15 +10,22 @@ export interface QuizAttemptRecord {
   createdAt: string;
 }
 
-const QUIZ_ATTEMPT_STORAGE_KEY = "quiz-attempt-history";
+/**
+ * Build a user-scoped localStorage key so quiz history
+ * never leaks across accounts on the same browser.
+ */
+function getStorageKey(userId?: string): string {
+  const base = "quiz-attempt-history";
+  return userId ? `${base}:${userId}` : base;
+}
 
-export function readQuizAttemptHistory(): QuizAttemptRecord[] {
+export function readQuizAttemptHistory(userId?: string): QuizAttemptRecord[] {
   if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    const rawValue = window.localStorage.getItem(QUIZ_ATTEMPT_STORAGE_KEY);
+    const rawValue = window.localStorage.getItem(getStorageKey(userId));
     if (!rawValue) {
       return [];
     }
@@ -30,12 +37,25 @@ export function readQuizAttemptHistory(): QuizAttemptRecord[] {
   }
 }
 
-export function saveQuizAttempt(attempt: QuizAttemptRecord) {
+export function saveQuizAttempt(attempt: QuizAttemptRecord, userId?: string) {
   if (typeof window === "undefined") {
     return;
   }
 
-  const existing = readQuizAttemptHistory();
+  const key = getStorageKey(userId);
+  const existing = readQuizAttemptHistory(userId);
   const nextAttempts = [attempt, ...existing].slice(0, 100);
-  window.localStorage.setItem(QUIZ_ATTEMPT_STORAGE_KEY, JSON.stringify(nextAttempts));
+  window.localStorage.setItem(key, JSON.stringify(nextAttempts));
+}
+
+/**
+ * Remove all quiz data for the current user from localStorage.
+ * Called on sign-out to prevent data leaking to the next user.
+ */
+export function clearQuizAttemptHistory(userId?: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.removeItem(getStorageKey(userId));
 }

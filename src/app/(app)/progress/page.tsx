@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import type { StudentProfileData } from "@/types";
 import { getAbilityBand } from "@/lib/ai/prompt-builder";
 import {
@@ -121,6 +122,8 @@ function buildRecommendedTopics(
 }
 
 export default function ProgressPage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [quizAttempts, setQuizAttempts] = useState<QuizAttemptRecord[]>([]);
@@ -130,7 +133,22 @@ export default function ProgressPage() {
   const [reportHtml, setReportHtml] = useState<string | null>(null);
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
+  // Reset state when user changes to prevent cross-account data bleed
   useEffect(() => {
+    setProfile(null);
+    setConversations([]);
+    setQuizAttempts([]);
+    setLoading(true);
+    setShowAllActivity(false);
+    setShowAllSnapshot(false);
+    setReportHtml(null);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
     let cancelled = false;
 
     async function load(showLoadingState = false) {
@@ -156,7 +174,7 @@ export default function ProgressPage() {
             ? conversationsData.conversations
             : []
         );
-        setQuizAttempts(readQuizAttemptHistory());
+        setQuizAttempts(readQuizAttemptHistory(userId));
       } catch {
         // keep previous UI state if refresh fails
       } finally {
@@ -185,7 +203,7 @@ export default function ProgressPage() {
       window.removeEventListener("focus", handleWindowFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [userId]);
 
   const analytics = useMemo(() => {
     const overallAccuracy =

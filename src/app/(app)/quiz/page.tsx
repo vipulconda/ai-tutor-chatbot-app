@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import type { StudentProfileData } from "@/types";
 import type { QuizQuestion } from "@/lib/ai/quiz-generator";
 import { saveQuizAttempt } from "@/lib/progress-storage";
@@ -18,6 +19,8 @@ type QuizState = "select" | "loading" | "active" | "results";
 
 export default function QuizPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
   const [profile, setProfile] = useState<StudentProfileData | null>(null);
   const [quizState, setQuizState] = useState<QuizState>("select");
   const [selectedSubject, setSelectedSubject] = useState("");
@@ -127,7 +130,7 @@ export default function QuizPage() {
       questionCount: questions.length,
       topics: Array.from(new Set(questions.map((question) => question.topic).filter(Boolean))),
       createdAt: new Date().toISOString(),
-    });
+    }, userId);
 
     hasSavedAttemptRef.current = true;
   }, [questions, quizState, score, scorePercent, selectedSubject]);

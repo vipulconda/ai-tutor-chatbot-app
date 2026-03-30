@@ -5,6 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import type { StudentProfileData } from "@/types";
 import { BOARDS, GRADES } from "@/types";
+import { clearQuizAttemptHistory } from "@/lib/progress-storage";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -15,7 +16,15 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const userId = session?.user?.id;
+
   useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
+    setProfile(null);
+
     fetch("/api/profiles")
       .then((r) => r.json())
       .then((data) => {
@@ -25,7 +34,7 @@ export default function SettingsPage() {
           setBoard(data.profile.board);
         }
       });
-  }, []);
+  }, [userId]);
 
   const handleSave = async () => {
     if (!profile) return;
@@ -51,6 +60,7 @@ export default function SettingsPage() {
   };
 
   const handleSignOut = async () => {
+    clearQuizAttemptHistory(session?.user?.id);
     await signOut({ redirect: false });
     router.push("/");
   };

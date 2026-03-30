@@ -42,11 +42,25 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  const userId = session?.user?.id;
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Reset state when user changes to prevent cross-account data bleed
   useEffect(() => {
+    setProfile(null);
+    setConversations([]);
+    setQuizAttempts([]);
+    setLoading(true);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+
     let cancelled = false;
 
     async function load(showLoadingState = false) {
@@ -73,7 +87,7 @@ export default function DashboardPage() {
 
         setProfile(profileData.profile);
         setConversations(convosData.conversations || []);
-        setQuizAttempts(readQuizAttemptHistory());
+        setQuizAttempts(readQuizAttemptHistory(userId));
       } catch (err) {
         console.error("Failed to load dashboard:", err);
       } finally {
@@ -102,7 +116,7 @@ export default function DashboardPage() {
       window.removeEventListener("focus", handleWindowFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [router]);
+  }, [router, userId]);
 
   const learningScore = useMemo(
     () =>
